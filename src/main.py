@@ -1,4 +1,5 @@
 from extract import extract_data
+from transform import transform_data
 
 
 def main():
@@ -8,7 +9,11 @@ def main():
 
     if data:
         print(f"Extracted {len(data)} records")
-        print(data[0])  # muestra un ejemplo
+
+        df = transform_data(data)
+
+        if df is not None:
+            print(df.head())
 
 
 if __name__ == "__main__":
