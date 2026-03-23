@@ -1,21 +1,40 @@
+import logging
 from extract import extract_data
 from transform import transform_data
 from load import load_data
 
+logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+logger = logging.getLogger(__name__)
 
-def main():
-    print("Starting ETL pipeline...")
 
-    data = extract_data()
+def run_pipeline():
+    """Orchestrate the full Extract -> Transform -> Load pipeline."""
+    logger.info("=" * 40)
+    logger.info("Starting ETL Crypto Pipeline...")
+    logger.info("=" * 40)
 
-    if data:
-        print(f"Extracted {len(data)} records")
+    # Step 1: Extract
+    raw_data = extract_data()
+    if raw_data is None:
+        logger.error("Pipeline aborted: extraction failed.")
+        return
 
-        df = transform_data(data)
+    logger.info(f"Extracted {len(raw_data)} raw records.")
 
-        if df is not None:
-            load_data(df)
+    # Step 2: Transform
+    df = transform_data(raw_data)
+    if df is None:
+        logger.error("Pipeline aborted: transformation failed.")
+        return
+
+    # Step 3: Load
+    success = load_data(df)
+
+    if success:
+        logger.info("Pipeline completed successfully.")
+    else:
+        logger.error("Pipeline finished with errors during load.")
 
 
 if __name__ == "__main__":
-    main()
+    run_pipeline()
